@@ -16,6 +16,7 @@ public class delete : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log("MP "+Input.mousePosition);
         if (Input.GetKeyDown(KeyCode.Space))
         {
             gameObject.GetComponent<Rigidbody>().AddForce(new Vector3(Random.Range(-0.5f,0.5f),Random.Range(-0.5f,0.5f),1)*10000);

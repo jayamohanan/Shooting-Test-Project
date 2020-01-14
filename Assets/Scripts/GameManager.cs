@@ -7,8 +7,9 @@ public class GameManager : MonoBehaviour
 {
     public GameObject targetPrefab;
     public GameObject gunMuzzle;
+    public GameObject crossHair;
     public float ZSpawnDistance = 15;
-    private float bulletImpact = 10000000f;
+    private float bulletImpact = 10000f;
     public TextMeshProUGUI redTxt, greenTxt, yellowTxt, blackTxt;
     private Queue<GameObject> targets = new Queue<GameObject>();
     private float zSpawnDistanceFromCamera;
@@ -42,7 +43,6 @@ public class GameManager : MonoBehaviour
         target.GetComponent<Target>().TargetInvisible += (targetObject)=> { targets.Enqueue(targetObject);};
         targets.Enqueue(target);
     }
-    // Update is called once per frame
     void Update()
     {
         if ((Time.time - lastSpawnTime)>0.5f)
@@ -54,9 +54,13 @@ public class GameManager : MonoBehaviour
         {
             Fire();
         }
+        crossHair.transform.position = gunMuzzle.transform.position+ gunMuzzle.transform.forward * (zSpawnDistanceFromCamera - 1);
+        crossHair.transform.LookAt(Camera.main.transform, Camera.main.transform.up);
+
     }
     private void Fire()
     {
+        Debug.Log("Fired");
         RaycastHit hit;
         if(Physics.Raycast(gunMuzzle.transform.position, gunMuzzle.transform.forward, out hit, 100))
         {

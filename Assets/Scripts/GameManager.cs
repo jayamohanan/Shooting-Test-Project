@@ -2,13 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
+[RequireComponent(typeof(AudioSource))]
 public class GameManager : MonoBehaviour
 {
     public GameObject targetPrefab;
     public GameObject gunMuzzle;
     public GameObject crossHair;
+    public GameObject gun;
+    public Transform targetParent;
+    public AudioClip gunShotSound;
+    private AudioSource audioSource;
     public float ZSpawnDistance = 15;
+    public float camShakeStrength=0.5f;
     public TextMeshProUGUI crosshairTargetTxt;
     private float bulletImpact = 10000f;
     public TextMeshProUGUI redTxt, greenTxt, yellowTxt, blackTxt;
@@ -24,13 +29,18 @@ public class GameManager : MonoBehaviour
     private float lastSpawnTime;
     private RaycastHit hit;
     string targetAtCrossHairMessage;
-    void Start()
+    private void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
         float horizontalFOV = Camera.VerticalToHorizontalFieldOfView(Camera.main.fieldOfView, Camera.main.aspect);
         Debug.Log("Horizontal FOV is " + horizontalFOV + " degrees, targets are spawned in 60 degree FOV region");
         zSpawnDistanceFromCamera = ZSpawnDistance - Camera.main.transform.position.z;
-        ySpawnDistanceFromCamera = Camera.main.ScreenToWorldPoint(new Vector3(0, 2260, zSpawnDistanceFromCamera)).y;//2160 is height, 2260 spanPos slightly above viewPort
-        targetSpawnRange = Mathf.Tan(panAngle*Mathf.Deg2Rad/2)* zSpawnDistanceFromCamera;
+        ySpawnDistanceFromCamera = Camera.main.ScreenToWorldPoint(new Vector3(0, Screen.height * 1.05f, zSpawnDistanceFromCamera)).y;//2160 is height, 2260 spanPos slightly above viewPort
+        targetSpawnRange = Mathf.Tan(panAngle * Mathf.Deg2Rad / 2) * zSpawnDistanceFromCamera;
+    }
+    void Start()
+    {
+        audioSource.clip = gunShotSound;
         InitializeTargetPool();
         lastSpawnTime = Time.time;
     }
@@ -43,7 +53,7 @@ public class GameManager : MonoBehaviour
     }
     private void AddTargetToPool()
     {
-        GameObject target = Instantiate(targetPrefab) as GameObject;
+        GameObject target = Instantiate(targetPrefab, targetParent) as GameObject;
         target.SetActive(false);
         target.GetComponent<Target>().TargetInvisible += (targetObject)=> { targets.Enqueue(targetObject);};
         targets.Enqueue(target);
@@ -64,14 +74,14 @@ public class GameManager : MonoBehaviour
         targetAtCrossHairMessage = crosshairTargetTxt.text;
         if (Physics.Raycast(gunMuzzle.transform.position, gunMuzzle.transform.forward, out hit, 100))
         {
-            if (targetAtCrossHairMessage== "On GunPoint")
+            if (targetAtCrossHairMessage== "")
             {
                 crosshairTargetTxt.text = "On GunPoint \n" + hit.collider.tag+" Cube";
             }
         }
         else
         {
-            crosshairTargetTxt.text = "On GunPoint";
+            crosshairTargetTxt.text = "";
         }
     }
     public void Fire()
@@ -101,6 +111,8 @@ public class GameManager : MonoBehaviour
             }
             UpdateHitCount();
         }
+        audioSource.Play();
+        StartCoroutine(gun.GetComponent<CameraShake>().ShakeCamera(0.05f, camShakeStrength));
     }
     private void UpdateHitCount()
     {
@@ -115,13 +127,14 @@ public class GameManager : MonoBehaviour
     }
     private void SpawnTargets()
     {
-        if (targets.Count < 0)
+        if (targets.Count==0)
         {
             AddTargetToPool();
             return;
         }
         GameObject target = targets.Dequeue();
         Vector3 spawnPosition = new Vector3(Random.Range(-targetSpawnRange, targetSpawnRange), ySpawnDistanceFromCamera, ZSpawnDistance);
+
         Vector3 spawnRotation = new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
         target.transform.position = spawnPosition;
         target.transform.rotation = Quaternion.Euler(spawnRotation);

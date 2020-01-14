@@ -12,13 +12,13 @@ public class InputManager : MonoBehaviour
     {
         
     }
-
     // Update is called once per frame
     void Update()
     {
         #region Standalone Inputs
         if (Input.GetMouseButtonDown(0))
         {
+            
             isDragging = true;
             startPosition = Input.mousePosition;
         }

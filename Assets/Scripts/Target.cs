@@ -10,6 +10,7 @@ public class Target : MonoBehaviour
     private void OnBecameInvisible()
     {
         Debug.Log("Became invisible");
+        gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;//Reset shot target's velocity for reusing
         gameObject.SetActive(false);
         TargetInvisible.Invoke(gameObject);
     }

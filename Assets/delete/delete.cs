@@ -10,11 +10,11 @@ public class delete : MonoBehaviour
     void Start()
     {
         Debug.Log("-Camera.main.transform.position.z " + -Camera.main.transform.position.z);
-        Vector3 ab = Camera.main.ScreenToWorldPoint(new Vector3(0, 2160, -Camera.main.transform.position.z));
+        Vector3 ab = Camera.main.ScreenToWorldPoint(new Vector3(0, Screen.height, -Camera.main.transform.position.z));
         float a = ab.y;
         Debug.Log("ab v3 " + ab);
         Debug.Log("a float " + a);
-        cube.transform.position = new Vector3(0, a, -Camera.main.transform.position.z);
+        cube.transform.position = ab;
         img.anchoredPosition = new Vector2(0, 1080);
         //Vector3 wP = Camera.main.ScreenToWorldPoint(new Vector3(0, 2160, 10));
         //float wPY = wP.y; ;

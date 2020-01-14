@@ -9,6 +9,7 @@ public class Target : MonoBehaviour
     public event Action<GameObject> TargetInvisible; 
     private void OnBecameInvisible()
     {
+        Debug.Log("Became invisible");
         gameObject.SetActive(false);
         TargetInvisible.Invoke(gameObject);
     }

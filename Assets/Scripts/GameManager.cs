@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public GameObject gunMuzzle;
     public GameObject crossHair;
     public float ZSpawnDistance = 15;
+    public TextMeshProUGUI crosshairTargetTxt;
     private float bulletImpact = 10000f;
     public TextMeshProUGUI redTxt, greenTxt, yellowTxt, blackTxt;
     private Queue<GameObject> targets = new Queue<GameObject>();
@@ -21,11 +22,15 @@ public class GameManager : MonoBehaviour
     private string[] targetTags = new string[] { "red", "green", "yellow", "black" };
     private int redCount, greenCount, yellowCount, blackCount;
     private float lastSpawnTime;
+    private RaycastHit hit;
+    string targetAtCrossHairMessage;
     void Start()
     {
+        float horizontalFOV = Camera.VerticalToHorizontalFieldOfView(Camera.main.fieldOfView, Camera.main.aspect);
+        Debug.Log("Horizontal FOV is " + horizontalFOV + " degrees, targets are spawned in 60 degree FOV region");
         zSpawnDistanceFromCamera = ZSpawnDistance - Camera.main.transform.position.z;
-        ySpawnDistanceFromCamera = Camera.main.ViewportToWorldPoint(new Vector3(0, 1.2f, zSpawnDistanceFromCamera)).y;
-        targetSpawnRange = Mathf.Tan(panAngle/2)* zSpawnDistanceFromCamera;
+        ySpawnDistanceFromCamera = Camera.main.ScreenToWorldPoint(new Vector3(0, 2260, zSpawnDistanceFromCamera)).y;//2160 is height, 2260 spanPos slightly above viewPort
+        targetSpawnRange = Mathf.Tan(panAngle*Mathf.Deg2Rad/2)* zSpawnDistanceFromCamera;
         InitializeTargetPool();
         lastSpawnTime = Time.time;
     }
@@ -56,9 +61,20 @@ public class GameManager : MonoBehaviour
         }
         crossHair.transform.position = gunMuzzle.transform.position+ gunMuzzle.transform.forward * (zSpawnDistanceFromCamera - 1);
         crossHair.transform.LookAt(Camera.main.transform, Camera.main.transform.up);
-
+        targetAtCrossHairMessage = crosshairTargetTxt.text;
+        if (Physics.Raycast(gunMuzzle.transform.position, gunMuzzle.transform.forward, out hit, 100))
+        {
+            if (targetAtCrossHairMessage== "On GunPoint")
+            {
+                crosshairTargetTxt.text = "On GunPoint \n" + hit.collider.tag+" Cube";
+            }
+        }
+        else
+        {
+            crosshairTargetTxt.text = "On GunPoint";
+        }
     }
-    private void Fire()
+    public void Fire()
     {
         Debug.Log("Fired");
         RaycastHit hit;
@@ -105,7 +121,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         GameObject target = targets.Dequeue();
-        Vector3 spawnPosition = new Vector3(Random.Range(-targetSpawnRange, targetSpawnRange), ySpawnDistanceFromCamera, zSpawnDistanceFromCamera);
+        Vector3 spawnPosition = new Vector3(Random.Range(-targetSpawnRange, targetSpawnRange), ySpawnDistanceFromCamera, ZSpawnDistance);
         Vector3 spawnRotation = new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
         target.transform.position = spawnPosition;
         target.transform.rotation = Quaternion.Euler(spawnRotation);

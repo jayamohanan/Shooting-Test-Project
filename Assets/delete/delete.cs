@@ -1,26 +1,31 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 [RequireComponent(typeof(Rigidbody))]
 public class delete : MonoBehaviour
 {
-    public AudioClip audioClip;
-    AudioSource audioSource;
-    // Start is called before the first frame update
+    public RectTransform img;
+    public GameObject cube;
     void Start()
     {
-        audioSource = GetComponent<AudioSource>();
-        audioSource.clip = audioClip;
+        Debug.Log("-Camera.main.transform.position.z " + -Camera.main.transform.position.z);
+        Vector3 ab = Camera.main.ScreenToWorldPoint(new Vector3(0, 2160, -Camera.main.transform.position.z));
+        float a = ab.y;
+        Debug.Log("ab v3 " + ab);
+        Debug.Log("a float " + a);
+        cube.transform.position = new Vector3(0, a, -Camera.main.transform.position.z);
+        img.anchoredPosition = new Vector2(0, 1080);
+        //Vector3 wP = Camera.main.ScreenToWorldPoint(new Vector3(0, 2160, 10));
+        //float wPY = wP.y; ;
+        //cube.transform.position = wP;
+        //Debug.Log("wP = "+wP+"  wPY = "+wPY+"  transform.y = "+cube.transform.position.y);
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("MP "+Input.mousePosition);
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            gameObject.GetComponent<Rigidbody>().AddForce(new Vector3(Random.Range(-0.5f,0.5f),Random.Range(-0.5f,0.5f),1)*10000);
-            audioSource.Play();
-        }
+
     }
 }

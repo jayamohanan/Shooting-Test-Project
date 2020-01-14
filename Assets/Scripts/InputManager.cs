@@ -7,18 +7,11 @@ public class InputManager : MonoBehaviour
     public float cameraTurnSpeed = 1f;
     bool isDragging;
     private Vector2 startPosition, dragDistance, deltaDragDistance;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-    // Update is called once per frame
     void Update()
     {
         #region Standalone Inputs
         if (Input.GetMouseButtonDown(0))
         {
-            
             isDragging = true;
             startPosition = Input.mousePosition;
         }
@@ -41,7 +34,7 @@ public class InputManager : MonoBehaviour
             }
         }
         #endregion
-        if (isDragging)
+        if (isDragging)//Restricted to Horizontal scrolling
         {
             dragDistance = (Vector2)Input.mousePosition - startPosition;
             deltaDragDistance = dragDistance - deltaDragDistance;
@@ -54,7 +47,6 @@ public class InputManager : MonoBehaviour
             }
             else
                 Debug.Log("Not rotating");
-                
             deltaDragDistance = dragDistance;
         }
     }

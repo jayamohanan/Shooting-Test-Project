@@ -6,10 +6,9 @@ using System;
 [RequireComponent(typeof(MeshRenderer))]
 public class Target : MonoBehaviour
 {
-    public event Action<GameObject> TargetInvisible; 
+    public event Action<GameObject> TargetInvisible; //Event tells GameManager to add this back to queue as it is out of cam frustrum
     private void OnBecameInvisible()
     {
-        Debug.Log("Became invisible");
         gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;//Reset shot target's velocity for reusing
         gameObject.SetActive(false);
         TargetInvisible.Invoke(gameObject);
